@@ -21,7 +21,7 @@ defmodule Raspi3.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nerves_uart, "~> 1.0.0"},
+      {:nerves_uart, "~> 1.2"},
       {:slack, "~> 0.12.0"}
     ]
   end

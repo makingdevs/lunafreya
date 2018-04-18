@@ -21,8 +21,6 @@ defmodule Raspi3.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:cowboy, "~> 1.0.0"},
-      {:plug, "~> 1.0"},
       {:slack, "~> 0.12.0"}
     ]
   end

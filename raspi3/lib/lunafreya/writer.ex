@@ -12,7 +12,7 @@ defmodule Raspi3.Writer do
 
   def handle_cast({:write, message}, state) do
     # IO.puts "I'm writing a new incoming message #{inspect state}"
-    IO.inspect UART.read(:uart_thing, 6000)
+    IO.inspect UART.read(Raspi3.Arduino.Serial, 6000)
     {:noreply, [message | state]}
   end
 end

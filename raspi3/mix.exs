@@ -14,6 +14,7 @@ defmodule Raspi3.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      mod: {Raspi3, []},
       extra_applications: [:logger]
     ]
   end

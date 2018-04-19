@@ -2,6 +2,7 @@ defmodule Raspi3.Arduino do
   use GenServer
 
   alias Nerves.UART
+  require Logger
 
   def start_link() do
     GenServer.start_link(__MODULE__, [])
@@ -12,6 +13,7 @@ defmodule Raspi3.Arduino do
     # UART.open(pid, "/dev/cu.usbmodem1431", speed: 9600, active: false)
     # UART.configure(pid, framing: {UART.Framing.Line, separator: "\r\n"})
     # {:ok, %{}}
+    schedule_work()
     {:ok, state}
   end
 
@@ -21,6 +23,15 @@ defmodule Raspi3.Arduino do
 
   def handle_cast({:put, data}, state) do
     {:noreply, [data | state]}
+  end
+
+  def handle_info(:work, state) do
+    schedule_work()
+    {:noreply, [ :os.system_time(:millisecond) | state]}
+  end
+
+  defp schedule_work() do
+    Process.send_after(self(), :work, 1000)
   end
 
 end

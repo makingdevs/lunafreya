@@ -5,6 +5,6 @@ defmodule Raspi3 do
     children = [
       Supervisor.child_spec({Raspi3.Supervisor, []}, id: Raspi3.Supervisor)
     ]
-    Supervisor.start_link(children, strategy: :one_for_one)
+    Supervisor.start_link(children, strategy: :one_for_one, name: Raspi3)
   end
 end

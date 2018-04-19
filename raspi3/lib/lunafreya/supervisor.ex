@@ -14,10 +14,7 @@ defmodule Raspi3.Supervisor do
 
     IO.inspect children
 
-    {:ok, pid} = Supervisor.init(children, strategy: :rest_for_one)
-    UART.open(:uart_thing, "/dev/cu.usbmodem1431", speed: 9600, active: false)
-    UART.configure(:uart_thing, framing: {UART.Framing.Line, separator: "\r\n"})
-    {:ok, pid}
+    Supervisor.init(children, strategy: :rest_for_one)
   end
 
 end

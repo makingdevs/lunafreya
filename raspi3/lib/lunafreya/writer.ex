@@ -14,10 +14,18 @@ defmodule Raspi3.Writer do
     GenServer.cast(__MODULE__, {:write, get_data})
   end
 
+  def timeseries() do
+    GenServer.call(__MODULE__, {:summary})
+  end
+
   def handle_cast({:write, get_data}, state) do
     {:ok, data} = get_data.()
     raw = Raw.new(data)
     {:noreply, [raw | state]}
+  end
+
+  def handle_call({:summary}, _from, state) do
+    {:reply, state, state}
   end
 end
 

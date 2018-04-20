@@ -29,3 +29,17 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 config :slack, api_token: System.get_env("SLACK_TOKEN")
+
+config :arc,
+  storage: Arc.Storage.S3, # or Arc.Storage.Local
+  bucket: {:system, "AWS_S3_BUCKET"} # if using Amazon S3
+
+config :ex_aws,
+  access_key_id: [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],
+  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role]
+  # region: "us-east-1",
+  # s3: [
+  #   scheme: "http://",
+  #   host: "training.makingdevs.com.s3.amazonaws.com",
+  #   region: "us-east-1"
+  # ]

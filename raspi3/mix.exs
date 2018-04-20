@@ -15,7 +15,7 @@ defmodule Raspi3.Mixfile do
   def application do
     [
       mod: {Raspi3, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :ex_aws, :hackney, :poison]
     ]
   end
 
@@ -24,7 +24,13 @@ defmodule Raspi3.Mixfile do
     [
       {:nerves_uart, "~> 1.2"},
       {:picam, "~> 0.2.0"},
-      {:slack, "~> 0.12.0"}
+      {:slack, "~> 0.12.0"},
+
+      {:arc, "~> 0.8.0"},
+      {:ex_aws, "~> 1.1"},
+      {:hackney, "~> 1.6"},
+      {:poison, "~> 3.1"},
+      {:sweet_xml, "~> 0.6"}
     ]
   end
 end

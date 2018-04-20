@@ -21,6 +21,7 @@ defmodule Raspi3.Writer do
   def handle_cast({:write, get_data}, state) do
     {:ok, data} = get_data.()
     raw = Raw.new(data)
+    Raspi3.Luna.think(raw)
     {:noreply, [raw | state]}
   end
 

@@ -23,6 +23,7 @@ defmodule Raspi3.Mixfile do
   defp deps do
     [
       {:nerves_uart, "~> 1.2"},
+      {:picam, "~> 0.2.0"},
       {:slack, "~> 0.12.0"}
     ]
   end

@@ -12,8 +12,6 @@ defmodule Raspi3.Supervisor do
       {Raspi3.Writer, []}
     ]
 
-    IO.inspect children
-
     Supervisor.init(children, strategy: :rest_for_one)
   end
 

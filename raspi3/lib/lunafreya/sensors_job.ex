@@ -1,6 +1,6 @@
 defmodule Raspi3.Sensors.Job do
   use GenServer
-  require Logger
+
   alias Nerves.UART
 
   def start_link(_args) do

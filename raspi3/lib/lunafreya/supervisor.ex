@@ -8,7 +8,7 @@ defmodule Raspi3.Supervisor do
   def init(_arg) do
     children = [
       {Nerves.UART, [name: Raspi3.Arduino.Serial]},
-      {Raspi3.Sensors.Data, []},
+      {Raspi3.Sensors.Job, []},
       {Raspi3.Writer, []}
     ]
 

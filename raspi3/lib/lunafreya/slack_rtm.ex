@@ -7,8 +7,9 @@ defmodule Raspi3.SlackRtm do
     {:ok, state}
   end
 
-  def handle_event(message = %{type: "message"}, slack, state) do
-    send_message("I got a message!", message.channel, slack)
+  def handle_event(message = %{type: "message"}, _slack, state) do
+    # send_message("I got a message!", message.channel, slack)
+    Logger.info "I got a message in #{inspect message}"
     {:ok, state}
   end
   def handle_event(_, _, state), do: {:ok, state}

@@ -3,7 +3,7 @@ defmodule Raspi3.Luna do
   alias Raspi3.Raw
 
   def think(%Raw{time: time} = data) do
-    case {rem(time.minute, 1), time.second} do
+    case {rem(time.minute, 5), time.second} do
       {0, 0} ->
         url = see_what_happens()
         send Raspi3.Slack, {:message, Raw.summary(data), "#iot"}

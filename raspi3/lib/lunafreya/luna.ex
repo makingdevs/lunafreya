@@ -3,19 +3,10 @@ defmodule Raspi3.Luna do
   alias Raspi3.Raw
 
   def think(%Raw{time: time, sensor_data: data}) do
-    url = see_what_happens()
-    case {time.minute, time.second} do
+    case {rem(time.minute, 5), time.second} do
       {0, 0} ->
-        send Raspi3.Slack, {:message, data, "#iot"}
-        send Raspi3.Slack, {:message, url, "#iot"}
-      {15, 0} ->
-        send Raspi3.Slack, {:message, data, "#iot"}
-        send Raspi3.Slack, {:message, url, "#iot"}
-      {30, 0} ->
-        send Raspi3.Slack, {:message, data, "#iot"}
-        send Raspi3.Slack, {:message, url, "#iot"}
-      {45, 0 } ->
-        send Raspi3.Slack, {:message, data, "#iot"}
+        url = see_what_happens()
+        send Raspi3.Slack, {:message, Raw.summary(data), "#iot"}
         send Raspi3.Slack, {:message, url, "#iot"}
       _ ->
         :ok
@@ -24,6 +15,7 @@ defmodule Raspi3.Luna do
 
   def see_what_happens() do
     Picam.set_size(1280, 0)
+    Picam.set_img_effect(:colorbalance)
     filename = "#{:os.system_time}" <> ".jpg"
     File.write!(Path.join(System.tmp_dir!, filename), Picam.next_frame)
     Raspi3.S3.store(Path.join(System.tmp_dir!, filename))

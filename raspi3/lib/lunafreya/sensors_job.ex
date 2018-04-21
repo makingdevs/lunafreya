@@ -8,7 +8,7 @@ defmodule Raspi3.Sensors.Job do
   end
 
   def init(state) do
-    UART.open(Raspi3.Arduino.Serial, "/dev/cu.usbmodem1431", speed: 9600, active: false)
+    UART.open(Raspi3.Arduino.Serial, "ttyACM0", speed: 9600, active: false)
     UART.configure(Raspi3.Arduino.Serial, framing: {UART.Framing.Line, separator: "\r\n"})
     {:ok, state, 1000}
   end

@@ -13,7 +13,7 @@ defmodule Raspi3.Supervisor do
       {Nerves.UART, [name: Raspi3.Arduino.Serial]},
       {Raspi3.Sensors.Job, []},
       {Raspi3.Writer, []},
-      {Picam.Camera, []},
+      worker(Picam.Camera, []),
       %{
         id: Slack.Bot,
         name: Raspi3.Slack,

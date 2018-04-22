@@ -14,8 +14,12 @@ defmodule Raspi3.Raw do
     |> Enum.filter(fn e -> e != " " end)
     |> Enum.map(&(String.trim/1))
     |> Enum.map(&(Integer.parse/1))
-    [{temperature, _}, {light, _}, {moving, _}, {distance, _}] = sensors
-    %Raspi3.Raw{raw | temperature: temperature, light: light, moving: moving, distance: distance}
+    case sensors do
+      [{temperature, _}, {light, _}, {moving, _}, {distance, _}] ->
+        %Raspi3.Raw{raw | temperature: temperature, light: light, moving: moving, distance: distance}
+      _ ->
+        raw
+    end
   end
 
   def summary(%Raw{} = raw) do

@@ -15,7 +15,6 @@ defmodule Raspi3.Luna do
 
   def see_what_happens() do
     Picam.set_size(1280, 0)
-    Picam.set_img_effect(:colorbalance)
     filename = "#{:os.system_time}" <> ".jpg"
     File.write!(Path.join(System.tmp_dir!, filename), Picam.next_frame)
     Raspi3.S3.store(Path.join(System.tmp_dir!, filename))

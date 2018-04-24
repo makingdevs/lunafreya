@@ -8,12 +8,13 @@ defmodule Raspi3.Supervisor do
   def init(_arg) do
 
     token = Application.get_env(:slack, :api_token)
+    camera = Application.get_env(:picam, :camera, Picam.Camera)
 
     children = [
       {Nerves.UART, [name: Raspi3.Arduino.Serial]},
-      {Raspi3.Sensors.Job, []},
+      # {Raspi3.Sensors.Job, []},
       {Raspi3.Writer, []},
-      worker(Picam.Camera, []),
+      camera,
       %{
         id: Slack.Bot,
         name: Raspi3.Slack,

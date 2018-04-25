@@ -12,7 +12,7 @@ defmodule Raspi3.Supervisor do
     children = [
       Raspi3.HardwareSupervisor,
       # {Raspi3.Sensors.Job, []},
-      {Raspi3.Writer, []},
+      {Raspi3.SensorData, []},
       %{
         id: Slack.Bot,
         name: Raspi3.Slack,

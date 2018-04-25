@@ -1,4 +1,4 @@
-defmodule Raspi3.Writer do
+defmodule Raspi3.SensorData do
   use GenServer
   alias Raspi3.Raw
 

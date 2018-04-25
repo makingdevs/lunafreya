@@ -15,7 +15,7 @@ defmodule Raspi3.Sensors.Job do
 
   def handle_info(:timeout, state) do
     get_data = fn -> UART.read(Raspi3.Arduino.Serial, 1000) end
-    Raspi3.Writer.write_info(get_data)
+    Raspi3.SensorData.write_info(get_data)
     {:noreply, state, 1000}
   end
 

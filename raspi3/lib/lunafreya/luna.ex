@@ -1,8 +1,21 @@
 defmodule Raspi3.Luna do
 
+  use GenServer
   alias Raspi3.Raw
 
-  def think(%Raw{time: time} = data) do
+  def start_link(_args) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def think(%Raw{} = data) do
+    GenServer.cast(__MODULE__, {:think, data})
+  end
+
+  def handle_cast({:think, %Raw{time: time} = data}, state) do
     case {rem(time.minute, 5), time.second} do
       {0, 0} ->
         url = see_what_happens()
@@ -11,6 +24,7 @@ defmodule Raspi3.Luna do
       _ ->
         :ok
     end
+    {:noreply, state}
   end
 
   def see_what_happens() do

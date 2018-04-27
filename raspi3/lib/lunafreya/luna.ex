@@ -3,6 +3,8 @@ defmodule Raspi3.Luna do
   use GenServer
   alias Raspi3.Raw
 
+  @uploader Application.get_env(:raspi3, :uploader)
+
   def start_link(_args) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -28,11 +30,11 @@ defmodule Raspi3.Luna do
   end
 
   def see_what_happens() do
-    Picam.set_size(1920, 0)
+    Picam.set_size(1920, 1080)
     filename = "#{:os.system_time}" <> ".jpg"
     File.write!(Path.join(System.tmp_dir!, filename), Picam.next_frame)
-    Raspi3.S3.store(Path.join(System.tmp_dir!, filename))
-    Raspi3.S3.url(filename)
+    @uploader.store(Path.join(System.tmp_dir!, filename))
+    @uploader.url(filename)
   end
 
 end

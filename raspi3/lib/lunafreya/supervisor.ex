@@ -10,10 +10,9 @@ defmodule Raspi3.Supervisor do
     token = Application.get_env(:slack, :api_token)
 
     children = [
-      {Nerves.UART, [name: Raspi3.Arduino.Serial]},
+      Raspi3.HardwareSupervisor,
       {Raspi3.Sensors.Job, []},
-      {Raspi3.Writer, []},
-      worker(Picam.Camera, []),
+      {Raspi3.SensorData, []},
       %{
         id: Slack.Bot,
         name: Raspi3.Slack,

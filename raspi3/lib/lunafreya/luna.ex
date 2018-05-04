@@ -1,8 +1,23 @@
 defmodule Raspi3.Luna do
 
+  use GenServer
   alias Raspi3.Raw
 
-  def think(%Raw{time: time} = data) do
+  @uploader Application.get_env(:raspi3, :uploader)
+
+  def start_link(_args) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def think(%Raw{} = data) do
+    GenServer.cast(__MODULE__, {:think, data})
+  end
+
+  def handle_cast({:think, %Raw{time: time} = data}, state) do
     case {rem(time.minute, 5), time.second} do
       {0, 0} ->
         url = see_what_happens()
@@ -11,14 +26,15 @@ defmodule Raspi3.Luna do
       _ ->
         :ok
     end
+    {:noreply, state}
   end
 
   def see_what_happens() do
-    Picam.set_size(1280, 0)
+    Picam.set_size(1920, 1080)
     filename = "#{:os.system_time}" <> ".jpg"
     File.write!(Path.join(System.tmp_dir!, filename), Picam.next_frame)
-    Raspi3.S3.store(Path.join(System.tmp_dir!, filename))
-    Raspi3.S3.url(filename)
+    @uploader.store(Path.join(System.tmp_dir!, filename))
+    @uploader.url(filename)
   end
 
 end

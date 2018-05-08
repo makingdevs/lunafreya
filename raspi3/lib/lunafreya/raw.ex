@@ -37,10 +37,10 @@ defmodule Raspi3.Raw do
     lights = (for r <- raw_list, do: r.light) |> Enum.sort
     movings = (for r <- raw_list, do: r.moving) |> Enum.sort
 
-    avg_temperature = (temperatures |> Enum.sum) / n
-    avg_distance = (distances |> Enum.sum) / n
-    avg_light = (lights |> Enum.sum) / n
-    avg_moving = (movings |> Enum.sum) / n
+    mean_temperature = (temperatures |> Enum.sum) / n
+    mean_distance = (distances |> Enum.sum) / n
+    mean_light = (lights |> Enum.sum) / n
+    mean_moving = (movings |> Enum.sum) / n
 
     median_temperature = temperatures |> median
     median_distance = distances |> median
@@ -48,10 +48,10 @@ defmodule Raspi3.Raw do
     median_moving = movings |> median
 
     %{
-      "temperature" => [average: avg_temperature, median: median_temperature],
-      "distance" => [average: avg_distance, median: median_distance],
-      "light" => [average: avg_light, median: median_light],
-      "moving" => [average: avg_moving, median: median_moving],
+      "temperature" => [average: mean_temperature, median: median_temperature],
+      "distance" => [average: mean_distance, median: median_distance],
+      "light" => [average: mean_light, median: median_light],
+      "moving" => [average: mean_moving, median: median_moving],
     }
 
   end

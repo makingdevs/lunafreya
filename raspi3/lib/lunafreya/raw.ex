@@ -26,4 +26,45 @@ defmodule Raspi3.Raw do
     "Temperature: #{raw.temperature}, Light: #{raw.light}, change position?: #{raw.moving}, Distance: #{raw.distance}"
   end
 
+  def statistics(raw_list) do
+    n = raw_list |> Enum.count
+
+    temperatures = (for r <- raw_list, do: r.temperature) |> Enum.sort
+    distances = (for r <- raw_list, do: r.distance) |> Enum.sort
+    lights = (for r <- raw_list, do: r.light) |> Enum.sort
+    movings = (for r <- raw_list, do: r.moving) |> Enum.sort
+
+    avg_temperature = (temperatures |> Enum.sum) / n
+    avg_distance = (distances |> Enum.sum) / n
+    avg_light = (lights |> Enum.sum) / n
+    avg_moving = (movings |> Enum.sum) / n
+
+    median_temperature = temperatures |> median
+    median_distance = distances |> median
+    median_light = lights |> median
+    median_moving = movings |> median
+
+    %{
+      "temperature" => [average: avg_temperature, median: median_temperature],
+      "distance" => [average: avg_distance, median: median_distance],
+      "light" => [average: avg_light, median: median_light],
+      "moving" => [average: avg_moving, median: median_moving],
+    }
+
+  end
+
+  defp median(list) when is_list(list) do
+    mid = length(list)/2 |> Float.floor |> round
+    {left, right} = list |> Enum.split(mid)
+    case length(right) > length(left) do
+      true ->
+        [m|_] = right
+        m
+      false ->
+        [m1|_] = right
+        [m2|_] = Enum.reverse(left)
+        (m1+m2) / 2
+    end
+  end
+
 end

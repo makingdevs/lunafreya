@@ -26,7 +26,7 @@ defmodule Raspi3.Luna do
   end
 
   def see_what_happens() do
-    Picam.set_size(1920, 1080)
+    Picam.set_size(640, 0)
     filename = "#{:os.system_time}" <> ".jpg"
     File.write!(Path.join(System.tmp_dir!, filename), Picam.next_frame)
     @uploader.store(Path.join(System.tmp_dir!, filename))

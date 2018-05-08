@@ -27,7 +27,10 @@ defmodule Raspi3.Raw do
   end
 
   def statistics(raw_list) do
-    n = raw_list |> Enum.count
+    n = case { x = Enum.count(raw_list) } do
+      { 0 } -> 1
+      _ -> x
+    end
 
     temperatures = (for r <- raw_list, do: r.temperature) |> Enum.sort
     distances = (for r <- raw_list, do: r.distance) |> Enum.sort

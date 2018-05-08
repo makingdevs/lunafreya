@@ -13,19 +13,15 @@ defmodule Raspi3.Luna do
     {:ok, state}
   end
 
-  def think(%Raw{} = data) do
-    GenServer.cast(__MODULE__, {:think, data})
+  def think(%Raw{} = data, avg_status) do
+    GenServer.cast(__MODULE__, {:think, data, avg_status})
   end
 
-  def handle_cast({:think, %Raw{time: time} = data}, state) do
-    case {rem(time.minute, 5), time.second} do
-      {0, 0} ->
-        url = see_what_happens()
-        send Raspi3.Slack, {:message, Raw.summary(data), "#iot"}
-        send Raspi3.Slack, {:message, url, "#iot"}
-      _ ->
-        :ok
-    end
+  def handle_cast({:think, %Raw{time: time} = data, avg_status}, state) do
+    # TODO: Perform the calculation
+    data
+    avg_status
+    state
     {:noreply, state}
   end
 

@@ -21,7 +21,8 @@ defmodule Raspi3.SensorData do
   def handle_cast({:write, get_data}, state) do
     {:ok, data} = get_data.()
     raw = Raw.new(data)
-    Raspi3.Luna.think(raw)
+    avg_status = state |> Enum.take(30)
+    Raspi3.Luna.think(raw, avg_status)
     {:noreply, [raw | state]}
   end
 

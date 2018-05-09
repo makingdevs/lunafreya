@@ -56,6 +56,7 @@ defmodule Raspi3.Raw do
 
   end
 
+  defp median([]), do: 0
   defp median(list) when is_list(list) do
     mid = length(list)/2 |> Float.floor |> round
     {left, right} = list |> Enum.split(mid)

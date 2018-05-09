@@ -9,19 +9,22 @@ defmodule Raspi3.Luna do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def init(state) do
-    {:ok, state}
+  def init(_) do
+    {:ok, [camera_busy: false]}
   end
 
-  def think(%Raw{} = data, avg_status) do
-    GenServer.cast(__MODULE__, {:think, data, avg_status})
+  def think(%Raw{} = data, data_for_last_seconds) do
+    GenServer.cast(__MODULE__, {:think, data, data_for_last_seconds})
   end
 
-  def handle_cast({:think, %Raw{time: time} = data, avg_status}, state) do
-    # TODO: Perform the calculation
+  def handle_cast({:think, %Raw{} = data, data_for_last_seconds}, state) do
     data
-    avg_status
-    state
+    stats = Raw.statistics(data_for_last_seconds)
+    # TODO: Compare the values
+    # Take the picture and block the camera, maybe a message
+    # Block the camera while picture
+    # Unblock after the picture
+
     {:noreply, state}
   end
 

@@ -18,8 +18,13 @@ defmodule Raspi3.Luna do
   end
 
   def handle_cast({:think, %Raw{} = data, data_for_last_seconds}, state) do
-    data
     stats = Raw.statistics(data_for_last_seconds)
+    case stats["distance"][:median] + 50 >= data.distance || data.distance <= stats["distance"][:median] + 50  do
+      true ->
+        IO.puts "Take the picture"
+      false ->
+        IO.puts "#{stats["distance"][:median] + 50} <= #{data.distance} || #{data.distance} >= #{stats["distance"][:median] + 50}"
+    end
     # TODO: Compare the values
     # Take the picture and block the camera, maybe a message
     # Block the camera while picture

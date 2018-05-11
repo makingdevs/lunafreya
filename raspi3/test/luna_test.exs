@@ -11,5 +11,13 @@ defmodule Raspi3.Luna.EyesTest do
     assert Eyes.object_is_in_range(400, 100) == :out_of_range
   end
 
+  test "luna have to use the eyes" do
+    assert Eyes.have_to_see(:not_busy) == :watch
+  end
+
+  test "luna have not to use the eyes" do
+    assert Eyes.have_to_see(:busy) == :not_watch
+  end
+
 end
 

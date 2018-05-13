@@ -47,12 +47,12 @@ defmodule Raspi3.Raw do
     median_light = lights |> median
     median_moving = movings |> median
 
-    {
-      :temperature, { :average, mean_temperature}, { :median, median_temperature},
-      :distance, { :average, mean_distance}, { :median, median_distance},
-      :light, { :average, mean_light}, { :median, median_light},
-      :moving, { :average, mean_moving}, { :median, median_moving}
-    }
+    [
+      temperature: [ mean: mean_temperature, median: median_temperature ],
+      distance: [ mean: mean_distance, median: median_distance ],
+      light: [ mean: mean_light, median: median_light ],
+      moving: [ mean: mean_moving, median: median_moving ]
+    ]
 
   end
 

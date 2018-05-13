@@ -4,8 +4,6 @@ defmodule Raspi3.Luna do
   alias Raspi3.Raw
   alias Raspi3.Luna.Eyes
 
-  @uploader Application.get_env(:raspi3, :uploader)
-
   def start_link(_args) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -36,21 +34,13 @@ defmodule Raspi3.Luna do
     case Eyes.preserve_the_moment({distance, median_t}, eyes_watching) do
       :record_image ->
         Process.send_after(self(), {:make_busy}, 1)
-        IO.puts "Start recording image"
+        "Start recording image"
         :timer.sleep(3000)
-        IO.puts "Ends recording image"
+        "Ends recording image"
         Process.send_after(self(), {:make_free}, 1)
       :dont_record ->
-        IO.puts "DONT record"
+        "DONT record"
     end
-  end
-
-  def see_what_happens() do
-    Picam.set_size(640, 0)
-    filename = "#{:os.system_time}" <> ".jpg"
-    File.write!(Path.join(System.tmp_dir!, filename), Picam.next_frame)
-    @uploader.store(Path.join(System.tmp_dir!, filename))
-    @uploader.url(filename)
   end
 
 end

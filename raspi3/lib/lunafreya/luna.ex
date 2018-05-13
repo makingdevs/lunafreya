@@ -2,6 +2,7 @@ defmodule Raspi3.Luna do
 
   use GenServer
   alias Raspi3.Raw
+  alias Raspi3.Luna.Eyes
 
   @uploader Application.get_env(:raspi3, :uploader)
 
@@ -10,7 +11,7 @@ defmodule Raspi3.Luna do
   end
 
   def init(_) do
-    {:ok, {:dont_record}}
+    {:ok, {:busy}}
   end
 
   def think(%Raw{} = data, data_for_last_seconds) do
@@ -18,15 +19,30 @@ defmodule Raspi3.Luna do
   end
 
   def handle_cast({:think, %Raw{} = data, data_for_last_seconds}, state) do
+    check_what_is_seeing(data, data_for_last_seconds, state)
     {:noreply, state}
   end
 
-  def handle_info({:picture_taked}, state) do
-    {:noreply, state}
+  def handle_info({:make_busy}, state) do
+    {:noreply, {:busy}}
   end
 
-  def take_the_picture() do
-    Process.send_after(self(), {:picture_taked}, 3 *  1000)
+  def handle_info({:make_free}, state) do
+    {:noreply, {:not_busy}}
+  end
+
+  def check_what_is_seeing(%Raw{distance: distance} = data, data_for_last_seconds, {eyes_watching}) do
+    [temperature: [mean: mean_t, median: median_t], distance: _, light: _, moving: _] = Raw.statistics(data_for_last_seconds)
+    case Eyes.preserve_the_moment({distance, median_t}, eyes_watching) do
+      :record_image ->
+        Process.send_after(self(), {:make_busy}, 1)
+        IO.puts "Start recording image"
+        :timer.sleep(3000)
+        IO.puts "Ends recording image"
+        Process.send_after(self(), {:make_free}, 1)
+      :dont_record ->
+        IO.puts "DONT record"
+    end
   end
 
   def see_what_happens() do

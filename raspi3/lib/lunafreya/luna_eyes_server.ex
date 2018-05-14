@@ -34,13 +34,13 @@ defmodule Raspi3.Luna.EyesServer do
 
 
     timestamp = :os.system_time
-    [video_command | video_args] = "ffmpeg -f image2 -i " <> base_dir <> "luna_%d.jpg " <> base_dir <> "video.avi"
+    [video_command | video_args] = "ffmpeg -f image2 -i " <> Path.join(base_dir, "luna_%d.jpg") <> " " <> Path.join(base_dir, "video.avi")
                                    |> String.split(" ")
 
     video_command |> System.cmd(video_args)
 
     gifname = "luna_#{timestamp}.gif"
-    [gif_command | gif_args] = "ffmpeg -i " <> base_dir <> "video.avi -pix_fmt rgb24 " <> base_dir <> gifname
+    [gif_command | gif_args] = "ffmpeg -i " <> Path.join(base_dir, "video.avi") <> " -pix_fmt rgb24 " <> Path.join(base_dir, gifname)
                                |> String.split(" ")
     gif_command |> System.cmd(gif_args)
 

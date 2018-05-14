@@ -16,10 +16,6 @@ defmodule Raspi3.Luna.EyesServer do
     GenServer.call(__MODULE__, {:open_the_eyes})
   end
 
-  # def handle_cast(message, state) do
-  #   {:noreply, state}
-  # end
-
   def handle_call({:open_the_eyes}, _from, state) do
     url = see_what_happens()
     {:reply, url, state}

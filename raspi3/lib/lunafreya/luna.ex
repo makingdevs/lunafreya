@@ -32,18 +32,24 @@ defmodule Raspi3.Luna do
 
   def check_what_is_seeing(%Raw{distance: distance}, data_for_last_seconds, {how_is_luna}) do
     [temperature: _, distance: [mean: mean_d, median: median_d], light: _, moving: _] = Raw.statistics(data_for_last_seconds)
-    case Eyes.preserve_the_moment({distance, median_d}, how_is_luna) do
-      :record_image ->
-        IO.puts "Start recording image"
-        EyesServer.open_the_eyes()
-      :dont_record ->
-        #IO.puts "DONT record"
-        :noop
+
+    case how_is_luna do
+      :ready_for_act ->
+        case Eyes.preserve_the_moment({distance, median_d}, how_is_luna) do
+          :record_image ->
+            IO.puts "Start recording image"
+            EyesServer.open_the_eyes()
+            :in_recovering
+          :dont_record ->
+            :ready_for_act
+        end
+      :in_recovering ->
+        case mean_d == median_d do
+          true -> :ready_for_act
+          false -> :in_recovering
+        end
     end
-    case mean_d == median_d do
-      true -> :ready_for_act
-      false -> :in_recovering
-    end
+
   end
 
 end

@@ -18,6 +18,7 @@ defmodule Raspi3.Luna.EyesServer do
 
   def handle_call({:open_the_eyes}, _from, state) do
     url = see_what_happens()
+    send Raspi3.Slack, {:message, "#{url}", "#iot"}
     {:reply, url, state}
   end
 

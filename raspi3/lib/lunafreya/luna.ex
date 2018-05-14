@@ -44,7 +44,7 @@ defmodule Raspi3.Luna do
             :ready_for_act
         end
       :in_recovering ->
-        case mean_d == median_d do
+        case mean_d <= (median_d + 2) && mean_d >= (median_d - 2) do
           true -> :ready_for_act
           false -> :in_recovering
         end

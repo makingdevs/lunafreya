@@ -13,18 +13,19 @@ defmodule Raspi3.Luna.EyesTest do
   end
 
   test "luna have to use the eyes" do
-    assert Eyes.have_to_see(:not_busy) == :watching
+    assert Eyes.have_to_see(:ready_for_act) == :watching
   end
 
   test "luna have not to use the eyes" do
-    assert Eyes.have_to_see(:busy) == :not_watching
+    assert Eyes.have_to_see(:in_recovering) == :not_watching
   end
 
   test "luna has to record the image" do
-    assert Eyes.preserve_the_moment( {100,100}, :busy    ) == :dont_record
-    assert Eyes.preserve_the_moment( {100,100}, :not_busy) == :dont_record
-    assert Eyes.preserve_the_moment( {400,100}, :busy    ) == :record_image
-    assert Eyes.preserve_the_moment( {400,100}, :not_busy) == :dont_record
+    assert Eyes.preserve_the_moment( {100,100}, :in_recovering) == :dont_record
+    assert Eyes.preserve_the_moment( {100,100}, :ready_for_act) == :dont_record
+    assert Eyes.preserve_the_moment( {400,100}, :in_recovering) == :dont_record
+    assert Eyes.preserve_the_moment( {400,100}, :ready_for_act) == :record_image
+    assert Eyes.preserve_the_moment( {400,350}, :ready_for_act) == :dont_record
   end
 
 end

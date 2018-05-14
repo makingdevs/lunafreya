@@ -3,43 +3,46 @@ defmodule Raspi3.Luna do
   use GenServer
   alias Raspi3.Raw
   alias Raspi3.Luna.Eyes
+  alias Raspi3.Luna.EyesServer
 
   def start_link(_args) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def init(_) do
-    {:ok, {:busy}}
+    {:ok, {:ready_for_act}}
   end
 
   def think(%Raw{} = data, data_for_last_seconds) do
     GenServer.cast(__MODULE__, {:think, data, data_for_last_seconds})
   end
 
+  def current_status() do
+    GenServer.call(__MODULE__, {:current_status})
+  end
+
   def handle_cast({:think, %Raw{} = data, data_for_last_seconds}, state) do
-    check_what_is_seeing(data, data_for_last_seconds, state)
-    {:noreply, state}
+    how_is_luna = check_what_is_seeing(data, data_for_last_seconds, state)
+    {:noreply, { how_is_luna }}
   end
 
-  def handle_info({:make_busy}, state) do
-    {:noreply, {:busy}}
+  def handle_call({:current_status}, _from, state) do
+    {:reply, state, state}
   end
 
-  def handle_info({:make_free}, state) do
-    {:noreply, {:not_busy}}
-  end
-
-  def check_what_is_seeing(%Raw{distance: distance} = data, data_for_last_seconds, {eyes_watching}) do
-    [temperature: [mean: mean_t, median: median_t], distance: _, light: _, moving: _] = Raw.statistics(data_for_last_seconds)
-    case Eyes.preserve_the_moment({distance, median_t}, eyes_watching) do
+  def check_what_is_seeing(%Raw{distance: distance}, data_for_last_seconds, {how_is_luna}) do
+    [temperature: _, distance: [mean: mean_d, median: median_d], light: _, moving: _] = Raw.statistics(data_for_last_seconds)
+    case Eyes.preserve_the_moment({distance, median_d}, how_is_luna) do
       :record_image ->
-        Process.send_after(self(), {:make_busy}, 1)
-        "Start recording image"
-        :timer.sleep(3000)
-        "Ends recording image"
-        Process.send_after(self(), {:make_free}, 1)
+        IO.puts "Start recording image"
+        EyesServer.open_the_eyes()
       :dont_record ->
-        "DONT record"
+        #IO.puts "DONT record"
+        :noop
+    end
+    case mean_d == median_d do
+      true -> :ready_for_act
+      false -> :in_recovering
     end
   end
 

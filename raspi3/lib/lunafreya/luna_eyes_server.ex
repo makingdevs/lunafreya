@@ -17,16 +17,14 @@ defmodule Raspi3.Luna.EyesServer do
   end
 
   def handle_call({:open_the_eyes}, _from, state) do
-    url = see_what_happens()
-    send Raspi3.Slack, {:message, "#{url}", "#iot"}
-    {:reply, url, state}
+    process = spawn(__MODULE__, :see_what_happens, [])
+    {:reply, process, state}
   end
 
   def see_what_happens() do
     Picam.set_size(640, 480)
 
     base_dir = System.tmp_dir!
-
     files = (1..60)
             |> Enum.map(fn i ->
               filename = "luna_#{i}" <> ".jpg"
@@ -35,27 +33,24 @@ defmodule Raspi3.Luna.EyesServer do
             end)
 
 
-    task = Task.async(fn ->
-      timestamp = :os.system_time
-      [video_command | video_args] = "ffmpeg -f image2 -i " <> base_dir <> "luna_%d.jpg " <> base_dir <> "video.avi"
-                                     |> String.split(" ")
+    timestamp = :os.system_time
+    [video_command | video_args] = "ffmpeg -f image2 -i " <> base_dir <> "luna_%d.jpg " <> base_dir <> "video.avi"
+                                   |> String.split(" ")
 
-                                     video_command |> System.cmd(video_args)
+    video_command |> System.cmd(video_args)
 
-                                     gifname = "luna_#{timestamp}.gif"
-                                     [gif_command | gif_args] = "ffmpeg -i " <> base_dir <> "video.avi -pix_fmt rgb24 " <> base_dir <> gifname
-                                                                |> String.split(" ")
-                                                                gif_command |> System.cmd(gif_args)
+    gifname = "luna_#{timestamp}.gif"
+    [gif_command | gif_args] = "ffmpeg -i " <> base_dir <> "video.avi -pix_fmt rgb24 " <> base_dir <> gifname
+                               |> String.split(" ")
+    gif_command |> System.cmd(gif_args)
 
-                                                                File.rm(Path.join(base_dir, "video.avi"))
-      files |> Enum.each(fn file -> File.rm(Path.join(System.tmp_dir!, file)) end)
+    File.rm(Path.join(base_dir, "video.avi"))
+    files |> Enum.each(fn file -> File.rm(Path.join(System.tmp_dir!, file)) end)
 
-      @uploader.store(Path.join(System.tmp_dir!, gifname))
-      @uploader.url(gifname)
+    @uploader.store(Path.join(System.tmp_dir!, gifname))
+    url = @uploader.url(gifname)
+    send Raspi3.Slack, {:message, "#{url}", "#iot"}
 
-      gifname
-    end)
-    Task.await(task)
   end
 
 end

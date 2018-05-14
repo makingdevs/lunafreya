@@ -24,10 +24,29 @@ defmodule Raspi3.Luna.EyesServer do
 
   def see_what_happens() do
     Picam.set_size(640, 480)
-    filename = "#{:os.system_time}" <> ".jpg"
-    File.write!(Path.join(System.tmp_dir!, filename), Picam.next_frame)
-    @uploader.store(Path.join(System.tmp_dir!, filename))
-    @uploader.url(filename)
+
+    base_dir = System.tmp_dir!
+
+    files = (1..120)
+            |> Enum.map(fn i ->
+              # filename = "luna_#{:os.system_time}" <> ".jpg"
+              filename = "luna_#{i}" <> ".jpg"
+              File.write!(Path.join(basedir, filename), Picam.next_frame)
+              filename
+            end)
+
+
+    'ffmpeg -f image2 -i' ++ (baseDir |> String.to_charlist)  ++ ' luna_%d.jpg video.avi'
+    'ffmpeg -i video.avi -pix_fmt rgb24 -loop_output 0 out.gif'
+
+    # files |> Enum.each(fn filename -> File.rm(Path.join(System.tmp_dir!, filename)) end)
+
+    IO.puts "Files generated"
+    IO.inspect files
+
+    # @uploader.store(Path.join(System.tmp_dir!, filename))
+    # @uploader.url(filename)
+    "temp"
   end
 
 end

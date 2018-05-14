@@ -27,26 +27,31 @@ defmodule Raspi3.Luna.EyesServer do
 
     base_dir = System.tmp_dir!
 
-    files = (1..120)
+    files = (1..60)
             |> Enum.map(fn i ->
-              # filename = "luna_#{:os.system_time}" <> ".jpg"
               filename = "luna_#{i}" <> ".jpg"
-              File.write!(Path.join(basedir, filename), Picam.next_frame)
+              File.write!(Path.join(base_dir, filename), Picam.next_frame)
               filename
             end)
 
 
-    'ffmpeg -f image2 -i' ++ (baseDir |> String.to_charlist)  ++ ' luna_%d.jpg video.avi'
-    'ffmpeg -i video.avi -pix_fmt rgb24 -loop_output 0 out.gif'
+    timestamp = :os.system_time
+    [video_command | video_args] = "ffmpeg -f image2 -i " <> base_dir <> "luna_%d.jpg " <> base_dir <> "video.avi"
+                                   |> String.split(" ")
 
-    # files |> Enum.each(fn filename -> File.rm(Path.join(System.tmp_dir!, filename)) end)
+    video_command |> System.cmd(video_args)
 
-    IO.puts "Files generated"
-    IO.inspect files
+    gifname = "luna_#{timestamp}.gif"
+    [gif_command | gif_args] = "ffmpeg -i " <> base_dir <> "video.avi -pix_fmt rgb24 " <> base_dir <> gifname
+                               |> String.split(" ")
+    gif_command |> System.cmd(gif_args)
 
-    # @uploader.store(Path.join(System.tmp_dir!, filename))
-    # @uploader.url(filename)
-    "temp"
+    File.rm(Path.join(base_dir, "video.avi"))
+    files |> Enum.each(fn file -> File.rm(Path.join(System.tmp_dir!, file)) end)
+
+    @uploader.store(Path.join(System.tmp_dir!, gifname))
+    @uploader.url(gifname)
+    gifname
   end
 
 end

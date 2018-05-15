@@ -37,7 +37,8 @@ defmodule Raspi3.SensorData do
   end
 
   def handle_call({:summary}, _from, state) do
-    {:reply, state, state}
+    result = state |>  Enum.filter(fn(%Raw{distance: distance}) -> distance > 0  end)
+    {:reply, result, state}
   end
 end
 

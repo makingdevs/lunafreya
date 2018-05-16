@@ -4,6 +4,7 @@ defmodule Raspi3.Luna.EyesServer do
 
   @uploader Application.get_env(:raspi3, :uploader)
   @base_dir System.tmp_dir!
+  @frames 60
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
@@ -25,7 +26,10 @@ defmodule Raspi3.Luna.EyesServer do
   def see_what_happens() do
     Picam.set_size(640, 480)
 
-    files = (1..60)
+    filenames  = for n <- (1..@frames),
+      do: "luna_#{i}" <> ".jpg"
+
+    files = (1..@frames)
             |> Enum.map(fn i ->
               filename = "luna_#{i}" <> ".jpg"
               capture_frame_with_name(filename)

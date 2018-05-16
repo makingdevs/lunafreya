@@ -3,6 +3,7 @@ defmodule Raspi3.Luna.EyesServer do
   use GenServer
 
   @uploader Application.get_env(:raspi3, :uploader)
+  @base_dir System.tmp_dir!
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
@@ -24,33 +25,36 @@ defmodule Raspi3.Luna.EyesServer do
   def see_what_happens() do
     Picam.set_size(640, 480)
 
-    base_dir = System.tmp_dir!
     files = (1..60)
             |> Enum.map(fn i ->
               filename = "luna_#{i}" <> ".jpg"
-              File.write!(Path.join(base_dir, filename), Picam.next_frame)
+              capture_frame_with_name(filename)
               filename
             end)
 
 
     timestamp = :os.system_time
-    [video_command | video_args] = "ffmpeg -f image2 -i " <> Path.join(base_dir, "luna_%d.jpg") <> " " <> Path.join(base_dir, "video.avi")
+    [video_command | video_args] = "ffmpeg -f image2 -i " <> Path.join(@base_dir, "luna_%d.jpg") <> " " <> Path.join(@base_dir, "video.avi")
                                    |> String.split(" ")
 
     video_command |> System.cmd(video_args)
 
     gifname = "luna_#{timestamp}.gif"
-    [gif_command | gif_args] = "ffmpeg -i " <> Path.join(base_dir, "video.avi") <> " -pix_fmt rgb24 " <> Path.join(base_dir, gifname)
+    [gif_command | gif_args] = "ffmpeg -i " <> Path.join(@base_dir, "video.avi") <> " -pix_fmt rgb24 " <> Path.join(@base_dir, gifname)
                                |> String.split(" ")
     gif_command |> System.cmd(gif_args)
 
-    File.rm(Path.join(base_dir, "video.avi"))
+    File.rm(Path.join(@base_dir, "video.avi"))
     files |> Enum.each(fn file -> File.rm(Path.join(System.tmp_dir!, file)) end)
 
     @uploader.store(Path.join(System.tmp_dir!, gifname))
     url = @uploader.url(gifname)
     send Raspi3.Slack, {:message, "#{url}", "#iot"}
 
+  end
+
+  def capture_frame_with_name(filename) do
+    File.write!(Path.join(@base_dir, filename), Picam.next_frame)
   end
 
 end

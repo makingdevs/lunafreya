@@ -26,8 +26,8 @@ defmodule Raspi3.Luna.EyesServer do
   def see_what_happens() do
     Picam.set_size(640, 480)
 
-    filenames  = for n <- (1..@frames),
-      do: "luna_#{i}" <> ".jpg"
+    filenames = for n <- (1..@frames),
+      do: "luna_#{n}" <> ".jpg"
 
     files = (1..@frames)
             |> Enum.map(fn i ->

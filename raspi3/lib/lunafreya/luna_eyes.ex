@@ -1,6 +1,6 @@
 defmodule Raspi3.Luna.Eyes do
 
-  @distance_for_diff 200
+  @distance_for_diff 150
 
   def see_the_same_object(distance, median) do
     case distance <= (median + @distance_for_diff) && distance >= (median - @distance_for_diff) do

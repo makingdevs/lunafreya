@@ -30,16 +30,17 @@ defmodule Raspi3.Luna.EyesServer do
 
     filenames |> capture_the_frames_with_names()
 
-    video_command = create_command_for_video()
-    video_command |> :os.cmd
-    { gifname, gif_command} = create_command_for_gif()
-    gif_command |> :os.cmd
+    [video_command | video_args] = create_command_for_video()
+    { gifname, [gif_command | gif_args]} = create_command_for_gif()
+
+    {_, 0} = System.cmd(video_command, video_args)
+    {_, 0} = System.cmd(gif_command, gif_args)
 
     File.rm(Path.join(@base_dir, "video.avi"))
     filenames |> Enum.each(fn file -> File.rm(Path.join(System.tmp_dir!, file)) end)
 
-    @uploader.store(Path.join(System.tmp_dir!, gifname |> List.to_string))
-    url = @uploader.url(gifname |> List.to_string)
+    @uploader.store(Path.join(System.tmp_dir!, gifname))
+    url = @uploader.url(gifname)
 
     send Raspi3.Slack, {:message, "#{url}", "#iot"}
 
@@ -56,21 +57,19 @@ defmodule Raspi3.Luna.EyesServer do
   end
 
   def create_command_for_video() do
-    pattern_for_files = Path.join(@base_dir, "luna_%d.jpg") |> String.to_charlist
-    video_name = Path.join(@base_dir, "video.avi") |> String.to_charlist
+    pattern_for_files = Path.join(@base_dir, "luna_%d.jpg")
+    video_name = Path.join(@base_dir, "video.avi")
 
-    # "ffmpeg -f image2 -i " <> pattern_for_files <> " " <> video_name
-    # |> String.split(" ")
+    "ffmpeg -f image2 -i " <> pattern_for_files <> " " <> video_name
+    |> String.split(" ")
 
-    'ffmpeg -f image2 -i ' ++ pattern_for_files ++ ' ' ++ video_name
   end
 
   def create_command_for_gif() do
-    gifname = Path.join(@base_dir, "luna_#{:os.system_time}.gif") |> String.to_charlist
-    video_name = Path.join(@base_dir, "video.avi") |> String.to_charlist
-    # command = "ffmpeg -i " <> video_name <> " -pix_fmt rgb24 " <> gifname
-    # |> String.split(" ")
-    command = 'ffmpeg -i ' ++ video_name ++ ' -pix_fmt rgb24 ' ++ gifname
+    gifname = Path.join(@base_dir, "luna_#{:os.system_time}.gif")
+    video_name = Path.join(@base_dir, "video.avi")
+    command = "ffmpeg -i " <> video_name <> " -pix_fmt rgb24 " <> gifname
+    |> String.split(" ")
     {gifname, command}
   end
 

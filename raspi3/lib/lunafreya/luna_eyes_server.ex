@@ -28,21 +28,18 @@ defmodule Raspi3.Luna.EyesServer do
 
     filenames = for n <- (1..@frames), do: "luna_#{n}" <> ".jpg"
 
-    capture_the_frames_with_names()
+    filenames |> capture_the_frames_with_names()
 
-    [video_command | video_args] = create_command_for_video()
-
-    video_command |> System.cmd(video_args)
-
-    [gif_command | gif_args] = create_command_for_gif()
-
-    gif_command |> System.cmd(gif_args)
+    video_command = create_command_for_video()
+    video_command |> :os.cmd
+    { gifname, gif_command} = create_command_for_gif()
+    gif_command |> :os.cmd
 
     File.rm(Path.join(@base_dir, "video.avi"))
-    files |> Enum.each(fn file -> File.rm(Path.join(System.tmp_dir!, file)) end)
+    filenames |> Enum.each(fn file -> File.rm(Path.join(System.tmp_dir!, file)) end)
 
-    @uploader.store(Path.join(System.tmp_dir!, gifname))
-    url = @uploader.url(gifname)
+    @uploader.store(Path.join(System.tmp_dir!, gifname |> List.to_string))
+    url = @uploader.url(gifname |> List.to_string)
 
     send Raspi3.Slack, {:message, "#{url}", "#iot"}
 
@@ -55,21 +52,26 @@ defmodule Raspi3.Luna.EyesServer do
 
   def capture_the_frames_with_names(filenames) do
     filenames
-    |> Enum.each(fn i -> capture_frame_with_name(filename) end)
+    |> Enum.each(&(capture_frame_with_name(&1)))
   end
 
   def create_command_for_video() do
-    pattern_for_files = Path.join(@base_dir, "luna_%d.jpg")
-    video_name = Path.join(@base_dir, "video.avi")
-    "ffmpeg -f image2 -i " <> pattern_for_files <> " " <> video_name
-    |> String.split(" ")
+    pattern_for_files = Path.join(@base_dir, "luna_%d.jpg") |> String.to_charlist
+    video_name = Path.join(@base_dir, "video.avi") |> String.to_charlist
+
+    # "ffmpeg -f image2 -i " <> pattern_for_files <> " " <> video_name
+    # |> String.split(" ")
+
+    'ffmpeg -f image2 -i ' ++ pattern_for_files ++ ' ' ++ video_name
   end
 
   def create_command_for_gif() do
-    gifname = Path.join(@base_dir, "luna_#{:os.system_time}.gif")
-    video_name = Path.join(@base_dir, "video.avi")
-    "ffmpeg -i " <> video_name <> " -pix_fmt rgb24 " <> gifname
-    |> String.split(" ")
+    gifname = Path.join(@base_dir, "luna_#{:os.system_time}.gif") |> String.to_charlist
+    video_name = Path.join(@base_dir, "video.avi") |> String.to_charlist
+    # command = "ffmpeg -i " <> video_name <> " -pix_fmt rgb24 " <> gifname
+    # |> String.split(" ")
+    command = 'ffmpeg -i ' ++ video_name ++ ' -pix_fmt rgb24 ' ++ gifname
+    {gifname, command}
   end
 
 end

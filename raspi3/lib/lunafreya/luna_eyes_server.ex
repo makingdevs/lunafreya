@@ -1,6 +1,7 @@
 defmodule Raspi3.Luna.EyesServer do
 
   use GenServer
+  require Logger
 
   @uploader Application.get_env(:raspi3, :uploader)
   @base_dir System.tmp_dir!
@@ -19,8 +20,14 @@ defmodule Raspi3.Luna.EyesServer do
   end
 
   def handle_call({:open_the_eyes}, _from, state) do
-    process = spawn(__MODULE__, :see_what_happens, [])
-    {:reply, process, state}
+    # process = spawn(__MODULE__, :see_what_happens, [])
+    Logger.debug "Opening the eyes!"
+    result = Task.start fn ->
+      Logger.debug "Starting a task"
+      see_what_happens()
+      Logger.debug "Finishing the task"
+    end
+    {:reply, result, state}
   end
 
   def see_what_happens() do
@@ -31,9 +38,9 @@ defmodule Raspi3.Luna.EyesServer do
     filenames |> capture_the_frames_with_names()
 
     [video_command | video_args] = create_command_for_video()
-    { gifname, [gif_command | gif_args]} = create_command_for_gif()
-
     {_, 0} = System.cmd(video_command, video_args)
+
+    { gifname, [gif_command | gif_args]} = create_command_for_gif()
     {_, 0} = System.cmd(gif_command, gif_args)
 
     upload_file(gifname)
@@ -45,7 +52,6 @@ defmodule Raspi3.Luna.EyesServer do
 
   def capture_frame_with_name(filename) do
     File.write!(Path.join(@base_dir, filename), Picam.next_frame)
-    :ok
   end
 
   def capture_the_frames_with_names(filenames) do
@@ -56,29 +62,26 @@ defmodule Raspi3.Luna.EyesServer do
   def create_command_for_video() do
     pattern_for_files = Path.join(@base_dir, "luna_%d.jpg")
     video_name = Path.join(@base_dir, "video.avi")
-
     "ffmpeg -f image2 -i " <> pattern_for_files <> " " <> video_name
     |> String.split(" ")
-
   end
 
   def create_command_for_gif() do
-    gifname = Path.join(@base_dir, "luna_#{:os.system_time}.gif")
+    gifname = "luna_#{:os.system_time}.gif"
+    gifpath = Path.join(@base_dir, gifname)
     video_name = Path.join(@base_dir, "video.avi")
-    command = "ffmpeg -i " <> video_name <> " -pix_fmt rgb24 " <> gifname
+    command = "ffmpeg -i " <> video_name <> " -pix_fmt rgb24 " <> gifpath
     |> String.split(" ")
     {gifname, command}
   end
 
   def upload_file(gifname) do
-    result = Task.async(fn () ->
-      @uploader.store(Path.join(System.tmp_dir!, gifname))
-    end)
-    case Task.await(result) do
+    Logger.debug "#{gifname}"
+    case @uploader.store(Path.join(System.tmp_dir!, gifname)) do
       {:ok, filename} ->
         url = @uploader.url(filename)
-        IO.puts "#{filename}"
-        IO.puts "#{url}"
+        Logger.info "#{filename}"
+        Logger.info "#{url}"
         send Raspi3.Slack, {:message, "#{url}", "#iot"}
       message ->
         msg = "Can't upload image #{inspect message}"

@@ -1,6 +1,7 @@
 defmodule Raspi3.SensorData do
   use GenServer
   alias Raspi3.Raw
+  require Logger
 
   def start_link(_args) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -30,7 +31,7 @@ defmodule Raspi3.SensorData do
         {:noreply, [raw | state]}
 
       {:error, _} ->
-        IO.puts "Error getting data"
+        Logger.error "Error getting data"
         {:noreply, state}
 
     end

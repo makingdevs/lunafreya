@@ -20,9 +20,10 @@ defmodule Raspi3.SensorData do
   end
 
   def handle_cast({:write, get_data}, state) do
-    case {result, data} = get_data.() do
+    case get_data.() do
       {:ok, data} ->
         raw = Raw.new(data)
+        Logger.info "#{inspect raw}"
         data_for_last_seconds =
           state
           |> Enum.filter(fn(%Raw{distance: distance}) -> distance > 0  end)

@@ -20,7 +20,6 @@ defmodule Raspi3.Luna.EyesServer do
   end
 
   def handle_call({:open_the_eyes}, _from, state) do
-    # process = spawn(__MODULE__, :see_what_happens, [])
     Logger.debug "Opening the eyes!"
     result = Task.start fn ->
       Logger.debug "Starting a task"
@@ -76,12 +75,9 @@ defmodule Raspi3.Luna.EyesServer do
   end
 
   def upload_file(gifname) do
-    Logger.debug "#{gifname}"
     case @uploader.store(Path.join(System.tmp_dir!, gifname)) do
       {:ok, filename} ->
         url = @uploader.url(filename)
-        Logger.info "#{filename}"
-        Logger.info "#{url}"
         send Raspi3.Slack, {:message, "#{url}", "#iot"}
       message ->
         msg = "Can't upload image #{inspect message}"

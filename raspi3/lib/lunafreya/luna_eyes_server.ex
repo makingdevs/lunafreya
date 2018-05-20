@@ -38,10 +38,10 @@ defmodule Raspi3.Luna.EyesServer do
     filenames |> capture_the_frames_with_names()
 
     [video_command | video_args] = create_command_for_video()
-    {_, 0} = System.cmd(video_command, video_args)
+    {_, _} = System.cmd(video_command, video_args, [stderr_to_stdout: true])
 
     { gifname, [gif_command | gif_args]} = create_command_for_gif()
-    {_, 0} = System.cmd(gif_command, gif_args)
+    {_, _} = System.cmd(gif_command, gif_args, [stderr_to_stdout: true])
 
     upload_file(gifname)
 

@@ -36,13 +36,10 @@ defmodule Raspi3.Luna.EyesServer do
     {_, 0} = System.cmd(video_command, video_args)
     {_, 0} = System.cmd(gif_command, gif_args)
 
+    upload_file(gifname)
+
     File.rm(Path.join(@base_dir, "video.avi"))
     filenames |> Enum.each(fn file -> File.rm(Path.join(System.tmp_dir!, file)) end)
-
-    @uploader.store(Path.join(System.tmp_dir!, gifname))
-    url = @uploader.url(gifname)
-
-    send Raspi3.Slack, {:message, "#{url}", "#iot"}
 
   end
 
@@ -71,6 +68,22 @@ defmodule Raspi3.Luna.EyesServer do
     command = "ffmpeg -i " <> video_name <> " -pix_fmt rgb24 " <> gifname
     |> String.split(" ")
     {gifname, command}
+  end
+
+  def upload_file(gifname) do
+    result = Task.async(fn () ->
+      @uploader.store(Path.join(System.tmp_dir!, gifname))
+    end)
+    case Task.await(result) do
+      {:ok, filename} ->
+        url = @uploader.url(filename)
+        IO.puts "#{filename}"
+        IO.puts "#{url}"
+        send Raspi3.Slack, {:message, "#{url}", "#iot"}
+      message ->
+        msg = "Can't upload image #{inspect message}"
+        send Raspi3.Slack, {:message, msg, "#iot"}
+    end
   end
 
 end

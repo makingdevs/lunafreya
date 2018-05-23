@@ -40,7 +40,7 @@ defmodule Raspi3.SensorData do
   end
 
   # Validar la ejecución de `think` cuando raw.distance es > 0
-  def act(%Raw{distance: distance}, state) when distance > 0 do
+  def act(%Raw{distance: distance} = raw, state) when distance > 0 do
     data_for_last_seconds =
       state
       |> Enum.filter(fn(%Raw{distance: distance}) -> distance > 0  end)

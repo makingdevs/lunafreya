@@ -24,11 +24,7 @@ defmodule Raspi3.SensorData do
       {:ok, data} ->
         raw = Raw.new(data)
         Logger.info "#{inspect raw}"
-        data_for_last_seconds =
-          state
-          |> Enum.filter(fn(%Raw{distance: distance}) -> distance > 0  end)
-          |> Enum.take(30)
-        Raspi3.Luna.think(raw, data_for_last_seconds)
+        raw |> act(state)
         {:noreply, [raw | state]}
 
       {:error, _} ->
@@ -42,5 +38,19 @@ defmodule Raspi3.SensorData do
     result = state |>  Enum.filter(fn(%Raw{distance: distance}) -> distance > 0  end)
     {:reply, result, state}
   end
+
+  # Validar la ejecución de `think` cuando raw.distance es > 0
+  def act(%Raw{distance: distance}, state) when distance > 0 do
+    data_for_last_seconds =
+      state
+      |> Enum.filter(fn(%Raw{distance: distance}) -> distance > 0  end)
+      |> Enum.take(30)
+    Raspi3.Luna.think(raw, data_for_last_seconds)
+  end
+
+  def act(_, _) do
+    :ok
+  end
+
 end
 

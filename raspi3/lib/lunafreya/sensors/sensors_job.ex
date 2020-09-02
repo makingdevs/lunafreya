@@ -1,7 +1,7 @@
 defmodule Raspi3.Sensors.Job do
   use GenServer
 
-  @uart Application.get_env(:raspi3, :uart)
+  @uart Application.get_env(:pi3, :uart)
 
   def start_link(_args) do
     GenServer.start_link(__MODULE__, [])
@@ -18,6 +18,4 @@ defmodule Raspi3.Sensors.Job do
     Raspi3.SensorData.write_info(get_data)
     {:noreply, state, 1000}
   end
-
 end
-

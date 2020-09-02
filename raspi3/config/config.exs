@@ -29,4 +29,4 @@ end
 
 config :slack, api_token: System.get_env("SLACK_TOKEN")
 
-# import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

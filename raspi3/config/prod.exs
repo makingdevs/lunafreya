@@ -1,7 +1,7 @@
 use Mix.Config
 
-config :raspi3, uploader: Raspi3.S3
-config :raspi3, uart: Nerves.UART
+config :pi3, uploader: Raspi3.S3
+config :pi3, uart: Nerves.UART
 
 config :arc,
   # or Arc.Storage.Local

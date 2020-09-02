@@ -6,9 +6,8 @@ defmodule Raspi3.HardwareSupervisor do
   end
 
   def init(_arg) do
-
     camera = Application.get_env(:picam, :camera, Picam.Camera)
-    uart = Application.get_env(:raspi3, :uart)
+    uart = Application.get_env(:pi3, :uart)
 
     children = [
       {uart, [name: Raspi3.Arduino.Serial]},
@@ -17,5 +16,4 @@ defmodule Raspi3.HardwareSupervisor do
 
     Supervisor.init(children, strategy: :one_for_one)
   end
-
 end

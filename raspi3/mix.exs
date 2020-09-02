@@ -46,7 +46,6 @@ defmodule Pi3.MixProject do
 
       # My dependencies
       {:picam, "~> 0.4.0"},
-      {:slack, "~> 0.23.5"},
       {:arc, "~> 0.11.0"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"},
@@ -54,6 +53,7 @@ defmodule Pi3.MixProject do
       {:poison, "~> 3.1"},
       {:sweet_xml, "~> 0.6"},
       {:nerves_uart, "~> 1.2"},
+      {:telegram, git: "https://github.com/visciang/telegram.git", tag: "0.6.1"},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.6", targets: @all_targets},

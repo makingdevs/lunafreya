@@ -23,19 +23,18 @@ defmodule Raspi3.SensorData do
     case get_data.() do
       {:ok, data} ->
         raw = Raw.new(data)
-        Logger.info "#{inspect raw}"
+        # Logger.info "#{inspect raw}"
         raw |> act(state)
         {:noreply, [raw | state]}
 
       {:error, _} ->
-        Logger.error "Error getting data"
+        Logger.error("Error getting data")
         {:noreply, state}
-
     end
   end
 
   def handle_call({:summary}, _from, state) do
-    result = state |>  Enum.filter(fn(%Raw{distance: distance}) -> distance > 0  end)
+    result = state |> Enum.filter(fn %Raw{distance: distance} -> distance > 0 end)
     {:reply, result, state}
   end
 
@@ -43,14 +42,13 @@ defmodule Raspi3.SensorData do
   def act(%Raw{distance: distance} = raw, state) when distance > 0 do
     data_for_last_seconds =
       state
-      |> Enum.filter(fn(%Raw{distance: distance}) -> distance > 0  end)
+      |> Enum.filter(fn %Raw{distance: distance} -> distance > 0 end)
       |> Enum.take(30)
+
     Raspi3.Luna.think(raw, data_for_last_seconds)
   end
 
   def act(_, _) do
     :ok
   end
-
 end
-

@@ -6,25 +6,14 @@ defmodule Raspi3.Supervisor do
   end
 
   def init(_arg) do
-
     token = Application.get_env(:slack, :api_token)
 
     children = [
       Raspi3.HardwareSupervisor,
       {Raspi3.Sensors.Job, []},
-      {Raspi3.SensorData, []},
-      %{
-        id: Slack.Bot,
-        name: Raspi3.Slack,
-        start: {
-          Slack.Bot, :start_link,
-          [Raspi3.SlackRtm, [], token, %{name: Raspi3.Slack}]
-        }
-      }
+      {Raspi3.SensorData, []}
     ]
 
     Supervisor.init(children, strategy: :rest_for_one)
   end
-
 end
-

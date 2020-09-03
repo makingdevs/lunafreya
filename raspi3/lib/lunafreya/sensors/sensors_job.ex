@@ -4,7 +4,7 @@ defmodule Raspi3.Sensors.Job do
   @uart Application.get_env(:pi3, :uart)
 
   def start_link(_args) do
-    GenServer.start_link(__MODULE__, [])
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def init(state) do

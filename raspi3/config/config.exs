@@ -27,4 +27,8 @@ if Mix.target() != :host do
   import_config "target.exs"
 end
 
+config :telegram,
+  token: System.get_env("TELEGRAM_TOKEN"),
+  username: System.get_env("TELEGRAM_USERNAME")
+
 import_config "#{Mix.env()}.exs"

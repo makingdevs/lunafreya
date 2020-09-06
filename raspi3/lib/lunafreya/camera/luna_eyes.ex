@@ -31,17 +31,16 @@ defmodule Raspi3.Luna.Eyes do
     Picam.set_size(640, 480)
 
     @base_dir
-    |> create_path_with_timestamp(:os.system_time())
-    |> generate_filenames_tuples()
+    |> map_info_for_photos()
+    |> generate_filenames()
     |> capture_the_frames_with_names()
   end
 
-  def create_path_with_timestamp(base_dir, dir_name) do
-    (base_dir <> "/" <> "#{dir_name}") |> File.mkdir!()
-    {base_dir, "#{dir_name}"}
+  defp map_info_for_photos(base_dir) do
+    %{base_dir: base_dir, sub_dir: "#{:os.system_time()}"}
   end
 
-  def capture_frame_with_name({base, dir_name, filename}) do
+  defp capture_frame_with_name({base, dir_name, filename}) do
     base
     |> Path.join(dir_name)
     |> Path.join(filename)
@@ -50,13 +49,29 @@ defmodule Raspi3.Luna.Eyes do
     {base, dir_name, filename}
   end
 
-  def capture_the_frames_with_names(filenames) do
-    filenames
+  defp capture_the_frames_with_names(map_info) do
+    create_temp_dir(map_info)
+
+    map_info
+    |> tuples_with_info()
     |> Enum.map(&capture_frame_with_name(&1))
+
+    map_info
   end
 
-  def generate_filenames_tuples({base, dir_name}) do
-    for n <- 1..@frames, do: {base, dir_name, "luna_#{n}" <> ".jpg"}
+  defp tuples_with_info(%{base_dir: base_dir, sub_dir: sub_dir, filenames: filenames}) do
+    for f <- filenames, do: {base_dir, sub_dir, f}
+  end
+
+  defp create_temp_dir(%{base_dir: base_dir, sub_dir: sub_dir}) do
+    base_dir
+    |> Path.join(sub_dir)
+    |> File.mkdir()
+  end
+
+  defp generate_filenames(map) do
+    map
+    |> Map.put(:filenames, for(n <- 1..@frames, do: "luna_#{n}" <> ".jpg"))
   end
 
   def upload_file(gifname) do

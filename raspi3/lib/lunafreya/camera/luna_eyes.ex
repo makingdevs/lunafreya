@@ -2,7 +2,6 @@ defmodule Raspi3.Luna.Eyes do
   alias Raspi3.Raw
 
   @distance_for_diff 200
-  @uploader Application.get_env(:pi3, :uploader)
   @base_dir System.tmp_dir!()
 
   def see_the_same_object(distance, median) do
@@ -96,17 +95,5 @@ defmodule Raspi3.Luna.Eyes do
   defp generate_filenames(map, frames) do
     map
     |> Map.put(:filenames, for(n <- 1..frames, do: "luna_#{n}" <> ".jpg"))
-  end
-
-  def upload_file(gifname) do
-    case @uploader.store(Path.join(System.tmp_dir!(), gifname)) do
-      {:ok, filename} ->
-        url = @uploader.url(filename)
-        send(Raspi3.Slack, {:message, "#{url}", "#iot"})
-
-      message ->
-        msg = "Can't upload image #{inspect(message)}"
-        send(Raspi3.Slack, {:message, msg, "#iot"})
-    end
   end
 end

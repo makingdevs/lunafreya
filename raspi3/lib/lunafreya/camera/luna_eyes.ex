@@ -2,7 +2,6 @@ defmodule Raspi3.Luna.Eyes do
   @distance_for_diff 200
   @uploader Application.get_env(:pi3, :uploader)
   @base_dir System.tmp_dir!()
-  @frames 60
 
   def see_the_same_object(distance, median) do
     case distance <= median + @distance_for_diff && distance >= median - @distance_for_diff do
@@ -27,12 +26,12 @@ defmodule Raspi3.Luna.Eyes do
     end
   end
 
-  def see do
-    Picam.set_size(640, 480)
+  def see(frames \\ 1, [width: width, height: height] \\ [width: 640, height: 480]) do
+    Picam.set_size(width, height)
 
     @base_dir
     |> map_info_for_photos()
-    |> generate_filenames()
+    |> generate_filenames(frames)
     |> capture_the_frames_with_names()
   end
 
@@ -69,9 +68,9 @@ defmodule Raspi3.Luna.Eyes do
     |> File.mkdir()
   end
 
-  defp generate_filenames(map) do
+  defp generate_filenames(map, frames) do
     map
-    |> Map.put(:filenames, for(n <- 1..@frames, do: "luna_#{n}" <> ".jpg"))
+    |> Map.put(:filenames, for(n <- 1..frames, do: "luna_#{n}" <> ".jpg"))
   end
 
   def upload_file(gifname) do

@@ -1,19 +1,16 @@
 defmodule Raspi3.Telegram.Actions do
   @token Application.fetch_env!(:telegram, :token)
 
-  def echo(event_info) do
+  def send_message(chat_id, message) do
     Telegram.Api.request(@token, "sendMessage",
-      chat_id: event_info["chat"]["id"],
-      text: event_info["text"]
+      chat_id: chat_id,
+      text: message
     )
   end
 
-  def send_photo(event_info) do
-    photo_url = "/Users/makingdevs/Downloads/giphy.gif"
-    # photo_url = "https://media.giphy.com/media/lQDLwWUMPaAHvh8pAG/giphy.gif"
-
+  def send_photo(chat_id, photo_url) do
     Telegram.Api.request(@token, "sendPhoto",
-      chat_id: event_info["chat"]["id"],
+      chat_id: chat_id,
       photo: {:file, photo_url}
     )
   end

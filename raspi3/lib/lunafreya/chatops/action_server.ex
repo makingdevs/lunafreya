@@ -1,41 +1,20 @@
-defmodule Raspi3.Telegram.ActionServer do
-  use GenServer
-
+defmodule Raspi3.Telegram.Actions do
   @token Application.fetch_env!(:telegram, :token)
 
-  def(start_link(_)) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
-  end
-
   def echo(event_info) do
-    GenServer.cast(__MODULE__, {:echo, event_info})
-  end
-
-  def last_event do
-    GenServer.call(__MODULE__, :last_event)
-  end
-
-  # Callbacks
-
-  @impl true
-  def init(_) do
-    {:ok, %{}}
-  end
-
-  @impl true
-  def handle_cast({:echo, event_info}, _state) do
-    IO.inspect(event_info)
-
     Telegram.Api.request(@token, "sendMessage",
       chat_id: event_info["chat"]["id"],
-      text: "Hello! .. silently"
+      text: event_info["text"]
     )
-
-    {:noreply, event_info}
   end
 
-  @impl true
-  def handle_call(:last_event, _from, state) do
-    {:reply, state, state}
+  def send_photo(event_info) do
+    photo_url = "/Users/makingdevs/Downloads/giphy.gif"
+    # photo_url = "https://media.giphy.com/media/lQDLwWUMPaAHvh8pAG/giphy.gif"
+
+    Telegram.Api.request(@token, "sendPhoto",
+      chat_id: event_info["chat"]["id"],
+      photo: {:file, photo_url}
+    )
   end
 end

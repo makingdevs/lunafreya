@@ -10,8 +10,7 @@ defmodule Raspi3.Supervisor do
       Raspi3.HardwareSupervisor,
       Raspi3.Sensors.Job,
       Raspi3.SensorData,
-      Raspi3.Telegram.Bot,
-      Raspi3.Telegram.ActionServer
+      Raspi3.Telegram.Bot
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

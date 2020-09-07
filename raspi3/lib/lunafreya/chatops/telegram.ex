@@ -1,5 +1,5 @@
 defmodule Raspi3.Telegram.Bot do
-  alias Raspi3.Telegram.ActionServer
+  alias Raspi3.Telegram.Actions
 
   use Telegram.Bot,
     token: Application.fetch_env!(:telegram, :token),
@@ -19,6 +19,10 @@ defmodule Raspi3.Telegram.Bot do
     )
   end
 
+  command "see", _args do
+    Actions.send_photo(update)
+  end
+
   command unknown do
     request("sendMessage",
       chat_id: update["chat"]["id"],
@@ -27,7 +31,7 @@ defmodule Raspi3.Telegram.Bot do
   end
 
   message do
-    ActionServer.echo(update)
+    Actions.echo(update)
   end
 
   any do

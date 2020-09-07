@@ -20,7 +20,7 @@ defmodule Raspi3.Telegram.Bot do
   end
 
   command "see", _args do
-    Actions.send_photo(update)
+    Raspi3.Luna.BrainTasks.see_the_ambience(update["chat"]["id"])
   end
 
   command unknown do
@@ -31,7 +31,7 @@ defmodule Raspi3.Telegram.Bot do
   end
 
   message do
-    Actions.echo(update)
+    # Actions.echo(update)
   end
 
   any do

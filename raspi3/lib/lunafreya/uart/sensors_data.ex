@@ -1,4 +1,4 @@
-defmodule Raspi3.SensorData do
+defmodule Raspi3.Sensors.Data do
   use GenServer
   alias Raspi3.Raw
   require Logger

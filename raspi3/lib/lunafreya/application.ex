@@ -8,9 +8,7 @@ defmodule Pi3.Application do
 
     children =
       [
-        Supervisor.child_spec({Raspi3.Supervisor, []}, id: Raspi3.Supervisor),
-        Raspi3.Luna,
-        Raspi3.Luna.EyesServer
+        Raspi3.Luna.Supervisor
       ] ++ children(target())
 
     Supervisor.start_link(children, opts)

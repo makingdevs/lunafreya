@@ -1,4 +1,4 @@
-defmodule Raspi3.HardwareSupervisor do
+defmodule Raspi3.Luna.BrainSupervisor do
   use Supervisor
 
   def start_link(arg) do
@@ -6,12 +6,8 @@ defmodule Raspi3.HardwareSupervisor do
   end
 
   def init(_arg) do
-    camera = Application.get_env(:picam, :camera, Picam.Camera)
-    uart = Application.get_env(:pi3, :uart)
-
     children = [
-      {uart, [name: Raspi3.Arduino.Serial]},
-      camera
+      Raspi3.Luna.BrainServer
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

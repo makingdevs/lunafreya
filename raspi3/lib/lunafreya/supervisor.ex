@@ -1,4 +1,4 @@
-defmodule Raspi3.Supervisor do
+defmodule Raspi3.Luna.Supervisor do
   use Supervisor
 
   def start_link(arg) do
@@ -7,10 +7,11 @@ defmodule Raspi3.Supervisor do
 
   def init(_arg) do
     children = [
-      Raspi3.HardwareSupervisor,
-      Raspi3.Sensors.Job,
-      Raspi3.SensorData,
-      Raspi3.Telegram.Bot
+      Raspi3.Luna.EyesSupervisor,
+      Raspi3.Luna.SensorsSupervisor,
+      Raspi3.Luna.ChatopsSupervisor,
+      {Task.Supervisor, name: Raspi3.Luna.TaskSupervisor},
+      Raspi3.Luna.BrainSupervisor
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

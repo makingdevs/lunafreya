@@ -1,4 +1,6 @@
 defmodule Raspi3.Luna.Eyes do
+  alias Raspi3.Raw
+
   @distance_for_diff 200
   @uploader Application.get_env(:pi3, :uploader)
   @base_dir System.tmp_dir!()
@@ -23,6 +25,29 @@ defmodule Raspi3.Luna.Eyes do
       :record_image
     else
       _ -> :dont_record
+    end
+  end
+
+  def check_what_is_seeing(%Raw{distance: distance}, data_for_last_seconds, {how_is_luna}) do
+    [temperature: _, distance: [mean: mean_d, median: median_d], light: _, moving: _] =
+      Raw.statistics(data_for_last_seconds)
+
+    # TODO: This logic needs a test, and not is a gen_server
+    case how_is_luna do
+      :ready_for_act ->
+        case preserve_the_moment({distance, median_d}, how_is_luna) do
+          :record_image ->
+            :in_recovering
+
+          :dont_record ->
+            :ready_for_act
+        end
+
+      :in_recovering ->
+        case mean_d <= median_d + 2 && mean_d >= median_d - 2 do
+          true -> :ready_for_act
+          false -> :in_recovering
+        end
     end
   end
 

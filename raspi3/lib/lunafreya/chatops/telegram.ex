@@ -19,8 +19,8 @@ defmodule Raspi3.Telegram.Bot do
     )
   end
 
-  command "see", _args do
-    Raspi3.Luna.BrainTasks.see_the_ambience(update["chat"]["id"])
+  command "see", args do
+    Raspi3.Luna.BrainTasks.see_the_ambience(update["chat"]["id"], args)
   end
 
   command unknown do

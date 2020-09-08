@@ -94,6 +94,6 @@ defmodule Raspi3.Luna.Eyes do
 
   defp generate_filenames(map, frames) do
     map
-    |> Map.put(:filenames, for(n <- 1..frames, do: "luna_#{n}" <> ".jpg"))
+    |> Map.put(:filenames, for(_ <- 1..frames, do: "luna_#{:os.system_time()}" <> ".jpg"))
   end
 end

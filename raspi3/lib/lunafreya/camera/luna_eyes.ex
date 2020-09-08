@@ -2,7 +2,6 @@ defmodule Raspi3.Luna.Eyes do
   alias Raspi3.Raw
 
   @distance_for_diff 200
-  @base_dir System.tmp_dir!()
 
   def see_the_same_object(distance, median) do
     case distance <= median + @distance_for_diff && distance >= median - @distance_for_diff do
@@ -52,8 +51,9 @@ defmodule Raspi3.Luna.Eyes do
 
   def see(frames \\ 1, [width: width, height: height] \\ [width: 640, height: 480]) do
     Picam.set_size(width, height)
+    Picam.set_rotation(180)
 
-    @base_dir
+    System.tmp_dir!()
     |> map_info_for_photos()
     |> generate_filenames(frames)
     |> capture_the_frames_with_names()

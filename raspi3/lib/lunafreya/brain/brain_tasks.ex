@@ -17,8 +17,8 @@ defmodule Raspi3.Luna.BrainTasks do
     size = read_image_size(args)
 
     Eyes.see(frames, size)
-    |> upload_files()
     |> send_photo_messages(chat_id)
+    |> upload_files()
   end
 
   defp upload_files(%{base_dir: base_dir, sub_dir: sub_dir, filenames: filenames}) do
@@ -28,9 +28,14 @@ defmodule Raspi3.Luna.BrainTasks do
     end)
   end
 
-  def send_photo_messages(files, chat_id) do
-    for({:ok, f} <- files, do: f)
+  def send_photo_messages(
+        %{base_dir: base_dir, sub_dir: sub_dir, filenames: filenames} = files,
+        chat_id
+      ) do
+    for(f <- filenames, do: base_dir |> Path.join(sub_dir) |> Path.join(f))
     |> Enum.map(&Actions.send_photo(chat_id, &1))
+
+    files
   end
 
   defp read_frames(args) do
